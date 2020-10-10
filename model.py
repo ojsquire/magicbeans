@@ -12,8 +12,7 @@ matplotlib.use('agg')
 BASE_DIR = Path(__file__).resolve(strict=True).parent
 TODAY = datetime.date.today()
 
-def train(ticker="MSFT"):
-    # data = yf.download("^GSPC", "2008-01-01", TODAY.strftime("%Y-%m-%d"))
+def train(ticker):
     data = yf.download(ticker, "2020-01-01", TODAY.strftime("%Y-%m-%d"))
     data.head()
     data["Adj Close"].plot(title=f"{ticker} Stock Adjusted Closing Price")
@@ -28,13 +27,13 @@ def train(ticker="MSFT"):
     model = Prophet()
     model.fit(df_forecast)
 
-    joblib.dump(model, Path(BASE_DIR).joinpath(f"{ticker}.joblib"))
+    joblib.dump(model, Path(BASE_DIR).joinpath(f"trained_models/{ticker}.joblib"))
 
 
-def predict(ticker="MSFT", days=7):
-    model_file = Path(BASE_DIR).joinpath(f"{ticker}.joblib")
+def predict(ticker, days=7):
+    model_file = Path(BASE_DIR).joinpath(f"trained_models/{ticker}.joblib")
     if not model_file.exists():
-        return False
+        train(ticker)
 
     model = joblib.load(model_file)
 
@@ -45,8 +44,8 @@ def predict(ticker="MSFT", days=7):
 
     forecast = model.predict(df)
 
-    model.plot(forecast).savefig(f"{ticker}_plot.png")
-    model.plot_components(forecast).savefig(f"{ticker}_plot_components.png")
+    model.plot(forecast).savefig(f"predict_plots/{ticker}_plot.png")
+    model.plot_components(forecast).savefig(f"predict_plots{ticker}_plot_components.png")
 
     return forecast.tail(days).to_dict("records")
 
