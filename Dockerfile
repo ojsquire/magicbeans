@@ -3,5 +3,5 @@ RUN mkdir /magicbeans
 COPY . /magicbeans
 WORKDIR /magicbeans
 RUN pip install -r requirements.txt
-CMD ["uvicorn", "app:main", "--host", "0.0.0.0", "--port", "8008"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8008"]
 EXPOSE 8008
